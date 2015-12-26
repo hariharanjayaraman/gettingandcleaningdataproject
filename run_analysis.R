@@ -1,8 +1,12 @@
 # Runs analysis on the data set of UCI HAR Dataset and generates tidy dataset
 
+# Libraries needed for the script
+# dplyr library for selecting and mutating data frames 
 library("dplyr")
-library("doBy")
 
+# doBy pacakge for summarizing data, ddply can also be used but this does a good job with col names and is a wrapper 
+
+library("doBy")
 
 
 # read only if not in the environment, read is expensive, override it with forceupdate value below
@@ -13,6 +17,8 @@ if(forceupdate)
   rm(list = ls())
 }
 
+# check is the data has been already read
+##***************************************** Section 1: Reading Raw Data ********************************************##
 if(!exists("testdataset") )
 {
   print("Reading the raw data files, this may take some time")
@@ -21,6 +27,8 @@ if(!exists("testdataset") )
   
   
 }
+
+# read additional data on labels as well as activities
 
 testdataactivities <- data.frame(read.table("UCI HAR Dataset/test/y_test.txt"))
 trainingdataactivities <- data.frame(read.table("UCI HAR Dataset/train/y_train.txt"))
@@ -36,9 +44,12 @@ testdataactivities$V1 <- as.numeric(testdataactivities$V1)
 trainingdataactivities$V1 <- as.numeric(trainingdataactivities$V1)
 
 featurenames <- read.table("UCI HAR Dataset/features.txt")
-#featurenames <- as.vector(featurenames$V2)
+
+## Keeping existing feature names is problamatic as it has characters which are special characters in R as well the coloumn names are duplicate
 featurenames <- make.names(as.vector(featurenames$V2), unique = TRUE)
 #featurenames <- make.unique(as.vector(featurenames$V2))
+
+# set column names 
 
 colnames(testdataset) <- featurenames
 colnames(trainingdataset) <- featurenames
@@ -51,7 +62,9 @@ trainingdataactivityname = sapply(trainingdataactivities$V1, function(x) activit
 completetestdataset <- mutate(testdataset, tactivityname = testdataactivityname, tsubjects = testdatasubjects$V1 )
 completetrainingdataset <- mutate (trainingdataset, tactivityname = trainingdataactivityname, tsubjects = trainingdatasubjects$V1)
 
+##***************************************** Section 2: Merging test and Training  Data sets ********************************************##
 
+# Merge the data , checking if it exists as this operation is expensive
 if(!exists("mergeddataset"))
 {
   print("Generating Merged Data set")
@@ -64,6 +77,9 @@ if(!exists("mergeddataset"))
 # Now that we have merged data we need to have merged data we need to select only mean and standard diviation 
 
 print("Generating reduced data set with only Mean and Standard Diviation with Activity names")
+
+##***************************************** Section 1: Selecting and Summarizing  ********************************************##
+
 selectedmergeddataset <- select(mergeddataset, contains(".mean."), contains(".std."), contains("tactivityname"), contains("tsubjects"))
 
 #namesofcol <- names(selectedmergeddataset)
@@ -74,6 +90,13 @@ selectedmergeddataset <- select(mergeddataset, contains(".mean."), contains(".st
 
 #ddply(activity, .(tactivityname,tsubjects), summarise,meanx = mean(tBodyAcc.mean...X, na.rm = TRUE) )
 
-tidydataset <- summaryBy(.~tsubjects+tactivityname,data=selectedmergeddataset, FUN=c(mean), na.rm = TRUE, keep.names = TRUE)
+print("Generating tidy data set summary")
+tidydataset <- summaryBy(.~tsubjects+tactivityname,data=selectedmergeddataset, FUN=c(mean), na.rm = TRUE)
+
+
+#Write table
+
+print("Writing table ")
+write.table(tidydataset, "tidydataset.txt", row.names = FALSE)
 
 #remove all variables 
