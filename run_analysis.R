@@ -1,6 +1,7 @@
 # Runs analysis on the data set of UCI HAR Dataset and generates tidy dataset
 
 library("dplyr")
+library("doBy")
 
 
 
@@ -36,7 +37,8 @@ trainingdataactivities$V1 <- as.numeric(trainingdataactivities$V1)
 
 featurenames <- read.table("UCI HAR Dataset/features.txt")
 #featurenames <- as.vector(featurenames$V2)
-featurenames <- make.unique(as.vector(featurenames$V2))
+featurenames <- make.names(as.vector(featurenames$V2), unique = TRUE)
+#featurenames <- make.unique(as.vector(featurenames$V2))
 
 colnames(testdataset) <- featurenames
 colnames(trainingdataset) <- featurenames
@@ -62,11 +64,16 @@ if(!exists("mergeddataset"))
 # Now that we have merged data we need to have merged data we need to select only mean and standard diviation 
 
 print("Generating reduced data set with only Mean and Standard Diviation with Activity names")
-selectedmergeddataset <- select(mergeddataset, contains("mean"), contains("std"), contains("tactivityname"), contains("tsubjects"))
+selectedmergeddataset <- select(mergeddataset, contains(".mean."), contains(".std."), contains("tactivityname"), contains("tsubjects"))
 
-namesofcol <- names(selectedmergeddataset)
-newcols <- c("tactivityname","tsubjects")
+#namesofcol <- names(selectedmergeddataset)
+#newcols <- c("tactivityname","tsubjects")
 
 
-tidydataset <- melt(selectedmergeddataset,id= namesofcol[!namesofcol %in% newcols ], measure.vars = newcols)
+#tidydataset <- melt(selectedmergeddataset,id= namesofcol[!namesofcol %in% newcols ], measure.vars = newcols)
+
+#ddply(activity, .(tactivityname,tsubjects), summarise,meanx = mean(tBodyAcc.mean...X, na.rm = TRUE) )
+
+tidydataset <- summaryBy(.~tsubjects+tactivityname,data=selectedmergeddataset, FUN=c(mean), na.rm = TRUE, keep.names = TRUE)
+
 #remove all variables 
