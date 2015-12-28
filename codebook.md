@@ -2,6 +2,26 @@
 
 Following table show information regarding each of the column seen in the tidydataset generated after running Run_Analysis.R. The original features measured are described here(http://archive.ics.uci.edu/ml/machine-learning-databases/00240/UCI%20HAR%20Dataset.zip)
 
+Values of featres are only for Mean and standard Deviation. Below are the feature that are used and X, Y , Z dimensions.
+
+
+tBodyAcc-XYZ
+tGravityAcc-XYZ
+tBodyAccJerk-XYZ
+tBodyGyro-XYZ
+tBodyGyroJerk-XYZ
+tBodyAccMag
+tGravityAccMag
+tBodyAccJerkMag
+tBodyGyroMag
+tBodyGyroJerkMag
+fBodyAcc-XYZ
+fBodyAccJerk-XYZ
+fBodyGyro-XYZ
+fBodyAccMag
+fBodyAccJerkMag
+fBodyGyroMag
+fBodyGyroJerkMag
 
 | Variable                          | Data Type    | Value                                                                                    | Range              |
 | --------------------------------- |:------------:| ----------------------------------------------------------------------------------------:|-------------------:|
